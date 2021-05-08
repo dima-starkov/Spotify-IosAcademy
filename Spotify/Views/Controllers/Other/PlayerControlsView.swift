@@ -80,7 +80,7 @@ final class PlayerControlsView: UIView {
         super.init(frame: frame)
         backgroundColor = .clear
         addSubview(volumeSlider)
-       volumeSlider.addTarget(self, action: #selector(didSlideSlider(_:)), for: .valueChanged)
+        volumeSlider.addTarget(self, action: #selector(didSlideSlider(_:)), for: .valueChanged)
         
         addSubview(nameLabel)
         addSubview(subtitleLabel)
