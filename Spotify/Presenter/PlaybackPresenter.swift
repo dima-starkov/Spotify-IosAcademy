@@ -119,7 +119,7 @@ extension PlaybackPresenter: PlayerViewControllerDelegate {
             playerQueue?.removeAllItems()
             playerQueue = AVQueuePlayer(items: [firstItem])
             playerQueue?.play()
-            playerQueue?.volume = 0
+            playerQueue?.volume = 0.5
         }
     }
     
