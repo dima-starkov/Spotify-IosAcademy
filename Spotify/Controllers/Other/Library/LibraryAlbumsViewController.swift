@@ -22,16 +22,20 @@ class LibraryAlbumsViewController: UIViewController {
         table.isHidden = true
         return table
     }()
+    
+    private var observer: NSObjectProtocol?
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        setUpNoPlaylistsView()
+        setUpNoAlbumsView()
         tableView.delegate = self
         tableView.dataSource = self
         view.addSubview(tableView)
         fetchData()
-        
+        observer = NotificationCenter.default.addObserver(forName: .albumSavedNotification, object: nil, queue: .main, using: { [weak self] _ in
+            self?.fetchData()
+        })
     }
     
     @objc func didTapClose() {
@@ -40,17 +44,17 @@ class LibraryAlbumsViewController: UIViewController {
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
-        noAlbumsView.frame = CGRect(x: 0, y: 0, width: 150, height: 150)
-        noAlbumsView.center = view.center
-        tableView.frame = view.bounds
+        noAlbumsView.frame = CGRect(x: (view.widht - 150)/2, y: (view.height - 150)/2, width: 150, height: 150)
+        tableView.frame = CGRect(x: 0, y: 0, width: view.widht, height: view.height)
     }
     
     private func fetchData() {
+        albums.removeAll()
         APICaller.shared.getCurrentUserAlbums { [weak self] result in
             DispatchQueue.main.async {
                 switch result {
-                case .success(let playlists):
-                    self?.playlists = playlists
+                case .success(let albums):
+                    self?.albums = albums
                     self?.updateUI()
                 case .failure(let error):
                     print(error.localizedDescription)
@@ -60,7 +64,7 @@ class LibraryAlbumsViewController: UIViewController {
         
     }
     
-    private func setUpNoPlaylistsView() {
+    private func setUpNoAlbumsView() {
         noAlbumsView.delegate = self
         noAlbumsView.configure(with: ActionLabelViewViewModel(text: "Вы еще не сохраняли альбомы", actionTitle: "Смотреть"))
         view.addSubview(noAlbumsView)
@@ -109,6 +113,7 @@ extension LibraryAlbumsViewController: UITableViewDataSource,UITableViewDelegate
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
+        HapticsManager.shared.vibrateForSelection()
         let album = albums[indexPath.row]
     
         

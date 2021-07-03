@@ -44,8 +44,24 @@ class SettingsViewController: UIViewController,UITableViewDelegate,UITableViewDa
     }
     
     private func SignOutTapped() {
-        
-        
+        let alert = UIAlertController(title: "Выйти из Аккаунта", message: "Вы действительно хотите выйти?", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel, handler: nil))
+        alert.addAction(UIAlertAction(title: "Выйти", style: .destructive, handler: { _ in
+            AuthManager.shared.signOut { [weak self] signedOut in
+                if signedOut {
+                    DispatchQueue.main.async {
+                        let navVC = UINavigationController(rootViewController: WelcomeViewController())
+                        navVC.navigationBar.prefersLargeTitles = true
+                        navVC.viewControllers.first?.navigationItem.largeTitleDisplayMode = .always
+                        navVC.modalPresentationStyle = .fullScreen
+                        self?.present(navVC, animated: true, completion: {
+                            self?.navigationController?.popToRootViewController(animated: false)
+                        })
+                    }
+                }
+            }
+        }))
+        present(alert, animated: true, completion: nil)
     }
     
     private func viewProfile() {
